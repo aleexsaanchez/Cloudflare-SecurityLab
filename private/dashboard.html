@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protected Dashboard - Alex Sanchez</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 900px; 
+            margin: 40px auto; 
+            padding: 20px; 
+            line-height: 1.6; 
+            color: #333; 
+            background: #f9f9f9; 
+        }
+        h1, h2 { color: #1a1a1a; }
+        section { 
+            background: white; 
+            padding: 25px; 
+            margin: 25px 0; 
+            border-radius: 10px; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1); 
+        }
+        pre { 
+            background: #eee; 
+            padding: 12px; 
+            border-radius: 6px; 
+            overflow-x: auto; 
+        }
+        ul { padding-left: 20px; }
+        .highlight { font-weight: bold; color: #0066cc; }
+        a { color: #0066cc; }
+        footer { text-align: center; margin-top: 50px; font-size: 0.9em; color: #666; }
+    </style>
+</head>
+<body>
+    <h1>My Cloudflare Security Project</h1>
+    <p>Hello, <span id="user-email" class="highlight">loading...</span>! You've successfully authenticated via GitHub. Welcome to my protected security dashboard.</p>
+    <p>This page explains everything I've built — like a personal blog post about the project.</p>
+
+    <section>
+        <h2>1. Project Goal</h2>
+        <p>I wanted to go beyond basic tutorials and build a real, working example of Cloudflare security features on my own domain. This demonstrates:</p>
+        <ul>
+            <li>Zero Trust access control</li>
+            <li>Edge logic with Workers</li>
+            <li>Web Application Firewall rules</li>
+            <li>Clean architecture and code transparency</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>2. Access Control (Zero Trust)</h2>
+        <p>This entire subdomain (<code>secure.alexsanchez.site</code>) is protected by Cloudflare Zero Trust.</p>
+        <ul>
+            <li><strong>What I did:</strong> Created an Access application using GitHub as the identity provider.</li>
+            <li><strong>Result:</strong> Only users I allow (via GitHub email/org) can reach this page.</li>
+            <li><strong>Live proof:</strong> Your authenticated email is shown above. Try visiting in incognito → you'll be prompted to log in with GitHub.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>3. Edge Logic (Cloudflare Worker)</h2>
+        <p>A Worker runs on every request to this subdomain, injecting live data and adding security headers.</p>
+        <ul>
+            <li><strong>What it does:</strong> Reads request metadata and serves dynamic content without an origin server.</li>
+            <li><strong>Live proof:</strong></li>
+            <ul>
+                <li>Your IP: <span id="ip" class="highlight">loading...</span></li>
+                <li>Country: <span id="country" class="highlight">loading...</span></li>
+                <li>CF-RAY ID: <span id="ray" class="highlight">loading...</span></li>
+            </ul>
+            <li>Security headers added: <pre id="security-headers">loading...</pre></li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>4. WAF Protection</h2>
+        <p>I configured custom and managed WAF rules to block common attacks.</p>
+        <ul>
+            <li><strong>Example rule:</strong> Blocks requests containing <code>&lt;script&gt;</code> in query strings (common XSS attempt).</li>
+            <li><strong>Live test:</strong> Try adding <code>?attack=&lt;script&gt;alert(1)&lt;/script&gt;</code> to this URL → you should see a Cloudflare block page.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>5. Code Transparency</h2>
+        <p>Everything is open and versioned:</p>
+        <ul>
+            <li><code>public/index.html</code> → Public landing page</li>
+            <li><code>private/dashboard.html</code> → This page (source visible here on GitHub)</li>
+            <li>Worker code is deployed via dashboard but can be added later for full IaC.</li>
+            <li><a href="https://github.com/YOURUSERNAME/YOUR-REPO" target="_blank">View full repository →</a></li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>What's Next?</h2>
+        <p>Planned improvements:</p>
+        <ul>
+            <li>Add rate limiting rules</li>
+            <li>Create a fake "/admin" path to demonstrate attack blocking</li>
+            <li>Add geo-based logic in the Worker</li>
+            <li>Write a full README with screenshots</li>
+        </ul>
+    </section>
+
+    <footer>
+        Built by Alex Sanchez • December 2025 • Hosted securely on Cloudflare
+    </footer>
+
+    <script>
+        fetch('/__data')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('user-email').textContent = data.email || 'Unknown';
+                document.getElementById('ip').textContent = data.ip;
+                document.getElementById('country').textContent = data.country;
+                document.getElementById('ray').textContent = data.ray;
+                document.getElementById('security-headers').textContent = data.secHeaders;
+            })
+            .catch(() => {
+                document.getElementById('user-email').textContent = 'Error loading';
+            });
+    </script>
+</body>
+</html>
