@@ -1,114 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Protected Dashboard - Alex Sanchez</title>
+    <!-- Google Fonts: Space Grotesk -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "primary-hover": "#0f4bc4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "surface-dark": "#1a2230",
+                        "border-dark": "#282e39",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            max-width: 900px; 
-            margin: 40px auto; 
-            padding: 20px; 
-            line-height: 1.6; 
-            color: #333; 
-            background: #f9f9f9; 
+        .bg-glow {
+            background: radial-gradient(circle at 50% 0%, rgba(19, 91, 236, 0.15) 0%, rgba(16, 22, 34, 0) 50%);
         }
-        h1, h2 { color: #1a1a1a; }
-        section { 
-            background: white; 
-            padding: 25px; 
-            margin: 25px 0; 
-            border-radius: 10px; 
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1); 
-        }
-        pre { 
-            background: #eee; 
-            padding: 12px; 
-            border-radius: 6px; 
-            overflow-x: auto; 
-        }
-        ul { padding-left: 20px; }
-        .highlight { font-weight: bold; color: #0066cc; }
-        a { color: #0066cc; }
-        footer { text-align: center; margin-top: 50px; font-size: 0.9em; color: #666; }
     </style>
 </head>
-<body>
-    <h1>My Cloudflare Security Project</h1>
-    <p>Hello, <span id="user-email" class="highlight">loading...</span>! You've successfully authenticated via GitHub. Welcome to my protected security dashboard.</p>
-    <p>This page explains everything I've built — like a personal blog post about the project.</p>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen flex flex-col antialiased selection:bg-primary selection:text-white">
 
-    <section>
-        <h2>1. Project Goal</h2>
-        <p>I wanted to go beyond basic tutorials and build a real, working example of Cloudflare security features on my own domain. This demonstrates:</p>
-        <ul>
-            <li>Zero Trust access control</li>
-            <li>Edge logic with Workers</li>
-            <li>Web Application Firewall rules</li>
-            <li>Clean architecture and code transparency</li>
-        </ul>
-    </section>
+<!-- Top Navigation -->
+<header class="w-full border-b border-gray-200 dark:border-border-dark bg-white/50 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center gap-3">
+                <div class="flex items-center justify-center size-8 rounded bg-primary/20 text-primary">
+                    <span class="material-symbols-outlined text-[20px]">verified_user</span>
+                </div>
+                <h1 class="text-lg font-bold tracking-tight">Secure Dashboard</h1>
+            </div>
+            <div class="text-sm text-slate-600 dark:text-slate-400">
+                Logged in as: <span id="user-email" class="font-semibold text-primary">loading...</span>
+            </div>
+        </div>
+    </div>
+</header>
 
-    <section>
-        <h2>2. Access Control (Zero Trust)</h2>
-        <p>This entire subdomain (<code>secure.alexsanchez.site</code>) is protected by Cloudflare Zero Trust.</p>
-        <ul>
-            <li><strong>What I did:</strong> Created an Access application using GitHub as the identity provider.</li>
-            <li><strong>Result:</strong> Only users I allow (via GitHub email/org) can reach this page.</li>
-            <li><strong>Live proof:</strong> Your authenticated email is shown above. Try visiting in incognito → you'll be prompted to log in with GitHub.</li>
-        </ul>
-    </section>
+<!-- Main Content -->
+<main class="flex-grow relative flex flex-col px-4 py-12 sm:px-6 lg:px-8 bg-glow">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03]" style="background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px); background-size: 40px 40px;"></div>
+    
+    <div class="relative w-full max-w-4xl mx-auto space-y-12">
 
-    <section>
-        <h2>3. Edge Logic (Cloudflare Worker)</h2>
-        <p>A Worker runs on every request to this subdomain, injecting live data and adding security headers.</p>
-        <ul>
-            <li><strong>What it does:</strong> Reads request metadata and serves dynamic content without an origin server.</li>
-            <li><strong>Live proof:</strong></li>
-            <ul>
-                <li>Your IP: <span id="ip" class="highlight">loading...</span></li>
-                <li>Country: <span id="country" class="highlight">loading...</span></li>
-                <li>CF-RAY ID: <span id="ray" class="highlight">loading...</span></li>
-            </ul>
-            <li>Security headers added: <pre id="security-headers">loading...</pre></li>
-        </ul>
-    </section>
+        <!-- Hero/Intro Section -->
+        <div class="mb-12 flex flex-col gap-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider w-fit">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                Zero Trust Protected
+            </div>
+            <h2 class="text-3xl md:text-5xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">
+                My Cloudflare <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">Security Project</span>
+            </h2>
+            <p class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
+                Hello! You've successfully authenticated via GitHub. Welcome to my protected security dashboard. This page explains everything I've built — like a personal blog post about the project.
+            </p>
+        </div>
 
-    <section>
-        <h2>4. WAF Protection</h2>
-        <p>I configured custom and managed WAF rules to block common attacks.</p>
-        <ul>
-            <li><strong>Example rule:</strong> Blocks requests containing <code>&lt;script&gt;</code> in query strings (common XSS attempt).</li>
-            <li><strong>Live test:</strong> Try adding <code>?attack=&lt;script&gt;alert(1)&lt;/script&gt;</code> to this URL → you should see a Cloudflare block page.</li>
-        </ul>
-    </section>
+        <!-- Feature Chips -->
+        <div class="flex flex-wrap gap-3 w-full mb-12">
+            <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-dark border border-border-dark shadow-sm hover:border-primary/50 transition-colors group">
+                <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform text-[20px]">security</span>
+                <span class="text-sm font-medium text-white">WAF Rules</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-dark border border-border-dark shadow-sm hover:border-primary/50 transition-colors group">
+                <span class="material-symbols-outlined text-amber-400 group-hover:scale-110 transition-transform text-[20px]">bolt</span>
+                <span class="text-sm font-medium text-white">Workers</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-dark border border-border-dark shadow-sm hover:border-primary/50 transition-colors group">
+                <span class="material-symbols-outlined text-emerald-400 group-hover:scale-110 transition-transform text-[20px]">vpn_key</span>
+                <span class="text-sm font-medium text-white">Zero Trust</span>
+            </div>
+        </div>
 
-    <section>
-        <h2>5. Code Transparency</h2>
-        <p>Everything is open and versioned:</p>
-        <ul>
-            <li><code>public/index.html</code> → Public landing page</li>
-            <li><code>private/dashboard.html</code> → This page (source visible here on GitHub)</li>
-            <li>Worker code is deployed via dashboard but can be added later for full IaC.</li>
-            <li><a href="https://github.com/YOURUSERNAME/YOUR-REPO" target="_blank">View full repository →</a></li>
-        </ul>
-    </section>
+        <!-- Content Sections -->
+        <div class="space-y-8">
 
-    <section>
-        <h2>What's Next?</h2>
-        <p>Planned improvements:</p>
-        <ul>
-            <li>Add rate limiting rules</li>
-            <li>Create a fake "/admin" path to demonstrate attack blocking</li>
-            <li>Add geo-based logic in the Worker</li>
-            <li>Write a full README with screenshots</li>
-        </ul>
-    </section>
 
-    <footer>
-        Built by Alex Sanchez • December 2025 • Hosted securely on Cloudflare
-    </footer>
+            <section class="bg-surface-dark border border-border-dark rounded-xl p-6 space-y-4">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary text-[28px]">lock</span>
+                    <h3 class="text-xl font-bold">Access Control (Zero Trust)</h3>
+                </div>
+                <p class="text-slate-300">This entire subdomain (<code class="bg-background-dark px-2 py-1 rounded text-primary">secure.alexsanchez.site</code>) is protected by Cloudflare Zero Trust.</p>
+                <ul class="space-y-2 text-slate-300">
+                    <li><strong>What I did:</strong> Created an Access application using GitHub as the identity provider.</li>
+                    <li><strong>Result:</strong> Only users I allow (via GitHub email/org) can reach this page.</li>
+                    <li><strong>Live proof:</strong> Your authenticated email is shown above. Try visiting in incognito → you'll be prompted to log in with GitHub.</li>
+                </ul>
+            </section>
+
+            <section class="bg-surface-dark border border-border-dark rounded-xl p-6 space-y-4">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-amber-400 text-[28px]">bolt</span>
+                    <h3 class="text-xl font-bold">Edge Logic (Cloudflare Worker)</h3>
+                </div>
+                <p class="text-slate-300">A Worker runs on every request to this subdomain, injecting live data and adding security headers.</p>
+                <ul class="space-y-2 text-slate-300">
+                    <li><strong>What it does:</strong> Reads request metadata and serves dynamic content without an origin server.</li>
+                    <li><strong>Live proof:</strong></li>
+                </ul>
+                <ul class="space-y-1 text-slate-300 ml-6">
+                    <li>Your IP: <span id="ip" class="font-semibold text-primary">loading...</span></li>
+                    <li>Country: <span id="country" class="font-semibold text-primary">loading...</span></li>
+                    <li>CF-RAY ID: <span id="ray" class="font-semibold text-primary">loading...</span></li>
+                </ul>
+                <div class="mt-4">
+                    <p class="text-slate-300 mb-2"><strong>Security headers added:</strong></p>
+                    <pre id="security-headers" class="bg-background-dark p-3 rounded border border-border-dark text-sm overflow-x-auto text-slate-300">loading...</pre>
+                </div>
+            </section>
+
+            <section class="bg-surface-dark border border-border-dark rounded-xl p-6 space-y-4">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-red-400 text-[28px]">security</span>
+                    <h3 class="text-xl font-bold">WAF Protection</h3>
+                </div>
+                <p class="text-slate-300">I configured custom and managed WAF rules to block common attacks.</p>
+                <ul class="space-y-2 text-slate-300">
+                    <li><strong>Example rule:</strong> Blocks requests containing <code class="bg-background-dark px-2 py-1 rounded text-red-400">&lt;script&gt;</code> in query strings (common XSS attempt).</li>
+                    <li><strong>Live test:</strong> Try adding <code class="bg-background-dark px-2 py-1 rounded text-red-400">?attack=&lt;script&gt;alert(1)&lt;/script&gt;</code> to this URL → you should see a Cloudflare block page.</li>
+                </ul>
+            </section>
+
+            <section class="bg-surface-dark border border-border-dark rounded-xl p-6 space-y-4">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-emerald-400 text-[28px]">code</span>
+                    <h3 class="text-xl font-bold">Code Transparency</h3>
+                </div>
+                <p class="text-slate-300">Everything is open and versioned:</p>
+                <ul class="space-y-2 text-slate-300">
+                    <li><code class="bg-background-dark px-2 py-1 rounded">public/index.html</code> → Public landing page</li>
+                    <li><code class="bg-background-dark px-2 py-1 rounded">private/dashboard.html</code> → This page (source visible here on GitHub)</li>
+                    <li>Worker code is deployed via dashboard but can be added later for full IaC.</li>
+                    <li><a href="https://github.com/YOURUSERNAME/YOUR-REPO" target="_blank" class="text-primary hover:text-primary-hover underline">View full repository →</a></li>
+                </ul>
+            </section>
+
+            <section class="bg-surface-dark border border-border-dark rounded-xl p-6 space-y-4">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-blue-400 text-[28px]">lightbulb</span>
+                    <h3 class="text-xl font-bold">What's Next?</h3>
+                </div>
+                <p class="text-slate-300">Planned improvements:</p>
+                <ul class="space-y-2 text-slate-300">
+                    <li>Add rate limiting rules</li>
+                    <li>Create a fake "/admin" path to demonstrate attack blocking</li>
+                    <li>Add geo-based logic in the Worker</li>
+                    <li>Write a full README with screenshots</li>
+                </ul>
+            </section>
+
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="w-full py-6 border-t border-gray-200 dark:border-border-dark bg-white dark:bg-background-dark">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-center items-center gap-4 text-sm text-slate-500 dark:text-slate-500">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">engineering</span>
+            <span>Built by <strong>Alex Sanchez</strong> • December 2025 • Hosted securely on Cloudflare</span>
+        </div>
+    </div>
+</footer>
 
     <script>
         fetch('/__data')
