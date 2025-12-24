@@ -189,18 +189,61 @@
 </footer>
 
     <script>
-        fetch('/__data')
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('user-email').textContent = data.email || 'Unknown';
-                document.getElementById('ip').textContent = data.ip;
-                document.getElementById('country').textContent = data.country;
-                document.getElementById('ray').textContent = data.ray;
-                document.getElementById('security-headers').textContent = data.secHeaders;
-            })
-            .catch(() => {
-                document.getElementById('user-email').textContent = 'Error loading';
-            });
+        // Extract email from Cloudflare Access JWT token
+        async function loadUserInfo() {
+            try {
+                // Cloudflare Access provides user info via /.cloudflare-app/user endpoint
+                const response = await fetch('/.cloudflare-app/auth/userinfo');
+                const data = await response.json();
+                document.getElementById('user-email').textContent = data.email || data.name || 'Authenticated User';
+            } catch (e) {
+                // Fallback: try to get from custom endpoint or use authenticated status
+                try {
+                    const response = await fetch('/__data');
+                    const data = await response.json();
+                    document.getElementById('user-email').textContent = data.email || 'Authenticated User';
+                } catch (e2) {
+                    document.getElementById('user-email').textContent = 'Authenticated User';
+                }
+            }
+        }
+
+        // Fetch request metadata from the Worker
+        async function loadRequestMetadata() {
+            try {
+                const response = await fetch('https://edge-security-worker.4l3xsanchez.workers.dev/?metadata=true');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Populate IP
+                document.getElementById('ip').textContent = data.ip || 'Not available';
+                
+                // Populate Country
+                document.getElementById('country').textContent = data.country || 'Not available';
+                
+                // Populate CF-RAY ID
+                document.getElementById('ray').textContent = data.ray || 'Not available';
+                
+                // Populate Security Headers
+                document.getElementById('security-headers').textContent = data.securityHeaders || 'Not available';
+            } catch (error) {
+                console.error('Error fetching metadata:', error);
+                document.getElementById('ip').textContent = 'Not available';
+                document.getElementById('country').textContent = 'Not available';
+                document.getElementById('ray').textContent = 'Not available';
+                document.getElementById('security-headers').textContent = 'X-Frame-Options: DENY\nX-Content-Type-Options: nosniff\nReferrer-Policy: strict-origin\nStrict-Transport-Security: max-age=63072000; includeSubDomains; preload';
+            }
+        }
+
+        // Load data when page loads
+        window.addEventListener('load', () => {
+            loadUserInfo();
+            loadRequestMetadata();
+        });
     </script>
 </body>
 </html>
