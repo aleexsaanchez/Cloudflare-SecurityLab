@@ -1,11 +1,14 @@
 /**
  * Cloudflare Worker - Edge Security Demo
  * Handles request validation, security headers, and metadata endpoints
+ * Only accessible from secure.alexsanchez.site
  */
 
 export default {
   async fetch(request) {
     const url = new URL(request.url);
+    const origin = request.headers.get("Origin");
+    const referer = request.headers.get("Referer");
 
     // Parse Request Metadata
     const userAgent = request.headers.get("User-Agent") || "unknown";
@@ -21,12 +24,33 @@ export default {
       ip: clientIP,
       country: country,
       userAgent: userAgent,
-      cfRay: cfRay
+      cfRay: cfRay,
+      origin: origin,
+      referer: referer
     });
 
-    // Metadata endpoint - return request info as JSON
+    // Only allow requests from secure.alexsanchez.site
+    const allowedOrigin = "https://secure.alexsanchez.site";
+    const isAllowedOrigin = origin === allowedOrigin || referer?.startsWith(allowedOrigin);
+
+    // Metadata endpoint - return request info as JSON with CORS headers
     if (url.searchParams.has("metadata")) {
-      return new Response(
+      // Block if origin is not allowed
+      if (!isAllowedOrigin) {
+        console.log({
+          event: "blocked_invalid_origin",
+          origin: origin,
+          ip: clientIP
+        });
+        return new Response("Unauthorized origin", {
+          status: 403,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+      }
+
+      const response = new Response(
         JSON.stringify({
           ip: clientIP,
           country: country,
@@ -40,10 +64,34 @@ export default {
           ].join("\n")
         }),
         {
-          headers: { "Content-Type": "application/json" },
-          status: 200
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": allowedOrigin,
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Credentials": "true"
+          }
         }
       );
+      return response;
+    }
+
+    // Handle CORS preflight requests
+    if (request.method === "OPTIONS") {
+      if (!isAllowedOrigin) {
+        return new Response("Unauthorized origin", { status: 403 });
+      }
+
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Origin": allowedOrigin,
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Credentials": "true"
+        }
+      });
     }
 
     // Block Common Attack Paths
